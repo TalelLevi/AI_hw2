@@ -9,7 +9,7 @@ import sys, os
 # from PyQt4.QtCore import pyqtRemoveInputHook
 
 class NotAnimatedGame:
-    def __init__(self, size, block_locations, starts, player_1, player_2, moves='regular', time_to_make_a_move=2,
+    def __init__(self, size, block_locations, starts, player_1, player_2, moves='regular', time_to_make_a_move=220000000,
                  print_game_in_terminal=True):
         assert hasattr(player_1, 'set_game_params')
         assert hasattr(player_2, 'set_game_params')
@@ -73,15 +73,15 @@ class NotAnimatedGame:
                 move = self.players[player_index].make_move(self.time_to_make_a_move)
                 end = time.time()
                 diff = end - start
-                if diff > self.time_to_make_a_move:
-                    print()
-                    print('####################')
-                    print('####################')
-                    print(" Time Up For Player", player_index + 1)
-                    print("    Player", 1 - player_index + 1, "Won!")
-                    print('####################')
-                    print('####################')
-                    exit()
+                # if diff > self.time_to_make_a_move:
+                #     print()
+                #     print('####################')
+                #     print('####################')
+                #     print(" Time Up For Player", player_index + 1)
+                #     print("    Player", 1 - player_index + 1, "Won!")
+                #     print('####################')
+                #     print('####################')
+                #     exit()
             prev_loc = self.game.board.get_player_location(player_index + 1)
             # print('player is at loc', prev_loc)
             loc = (prev_loc[0] + move[0], prev_loc[1] + move[1])
