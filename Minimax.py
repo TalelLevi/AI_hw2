@@ -1,5 +1,4 @@
 
-
 def utility(problem):
     rival_possible_move = problem.get_nr_of_neighbor_unvisited_cell(2)
     our_possible_move = problem.get_nr_of_neighbor_unvisited_cell(1)
@@ -16,7 +15,7 @@ def estimate(problem):
     route_length = problem.get_length_of_route()
     possible_forks = problem.get_nr_of_neighbor_unvisited_cell(player1)
     dist_from_rival = problem.get_dist_from_rival()
-    return 6*route_length + 3*possible_forks + dist_from_rival
+    return 6 * route_length + 3 * possible_forks + dist_from_rival
 
 
 def heuristic(problem):
@@ -24,7 +23,8 @@ def heuristic(problem):
 
 
 class Minimax:
-    my_agent = 1
+    Maximizer = True
+    Minimizer = False
 
     def __init__(self, heuristic_function, alpha_beta_pruning=False, ordered_alpha_beta=False):
         self.num_of_leaves_expanded = 0
@@ -34,7 +34,7 @@ class Minimax:
         self.heuristic_function = heuristic_function
         pass
 
-    def solve_problem(self, problem, depth, playing_agent):
+    def solve_problem(self, problem, depth, playing_agent, alpha=float('-inf'), beta=float('inf')):
         """
 
         :param problem:
@@ -49,27 +49,42 @@ class Minimax:
         if depth == 0:
             self.num_of_leaves_expanded += 1
             return None, heuristic(problem), self.num_of_leaves_expanded
-        best_move = (0, 0)
+
         legal_moves = problem.legal_moves(playing_agent)
+        best_move = legal_moves[0]
         if self.ordered_alpha_beta:
-            legal_moves.sort()       #TODO sort the sons by heuristic func
-        if playing_agent == self.my_agent:
-            current_best_minmax_value = float("-inf")
-            for move in legal_moves: #TODO add support for alpha beta pruning
+            legal_moves.sort()  # TODO sort the sons by heuristic func
+
+        # Maximizer
+        if playing_agent == self.Maximizer:
+            best_minmax_value = float("-inf")
+            for move in legal_moves:  # TODO add support for alpha beta pruning
                 problem.execute_move(playing_agent, move)
-                _, minmax_val, leaves = self.solve_problem(problem, depth - 1, 1 - playing_agent) #TODO depth - 1 or None
-                if minmax_val > current_best_minmax_value:
-                    current_best_minmax_value = minmax_val
+                _, current_minmax_value, leaves = self.solve_problem(problem, depth - 1, self.Minimizer, alpha, beta)
+                if current_minmax_value > best_minmax_value:
+                    best_minmax_value = current_minmax_value
                     best_move = move
+                if self.alpha_beta_pruning:  # TODO check
+                    alpha = max(current_minmax_value, alpha)
+                    if beta <= alpha != float('inf'):
+                        problem.undo_move(playing_agent, move)
+                        return None, float('inf'), leaves
                 problem.undo_move(playing_agent, move)
-            return best_move, current_best_minmax_value, leaves
-        else:
-            current_best_minmax_value = float("inf")
+            return best_move, best_minmax_value, leaves
+
+        # Minimizer
+        else:  # playing_agent == self.Minimizer
+            best_minmax_value = float("inf")
             for move in legal_moves:
                 problem.execute_move(playing_agent, move)
-                _, minmax_val, leaves = self.solve_problem(problem, depth - 1, 1 - playing_agent)
-                if minmax_val < current_best_minmax_value:
-                    current_best_minmax_value = minmax_val
+                _, current_minmax_value, leaves = self.solve_problem(problem, depth - 1, self.Maximizer, alpha, beta)
+                if current_minmax_value < best_minmax_value:
+                    best_minmax_value = current_minmax_value
                     best_move = move
+                if self.alpha_beta_pruning:  # TODO check
+                    beta = min(current_minmax_value, beta)
+                    if alpha >= beta != float('-inf'):
+                        problem.undo_move(playing_agent, move)
+                        return None, float('-inf'), leaves
                 problem.undo_move(playing_agent, move)
-            return best_move, current_best_minmax_value, leaves
+            return best_move, best_minmax_value, leaves
