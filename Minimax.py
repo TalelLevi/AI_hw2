@@ -1,13 +1,13 @@
-
-def utility(problem):
-    rival_possible_move = problem.get_nr_of_neighbor_unvisited_cell(2)
-    our_possible_move = problem.get_nr_of_neighbor_unvisited_cell(1)
-    if rival_possible_move == 0 and our_possible_move > 0:
-        return float("inf")
-    elif our_possible_move == 0 and rival_possible_move > 0:
-        return float("-inf")
+def utility(problem, playing_agent):
+    if playing_agent:
+        rival_possible_move = problem.get_nr_of_neighbor_unvisited_cell(2)
+        if rival_possible_move > 0:
+            return float('-inf')
     else:
-        return 0
+        rival_possible_move = problem.get_nr_of_neighbor_unvisited_cell(1)
+        if rival_possible_move > 0:
+            return float('inf')
+    return 0
 
 
 def estimate(problem):
@@ -26,17 +26,21 @@ class Minimax:
     Maximizer = True
     Minimizer = False
 
-    def __init__(self, heuristic_function, alpha_beta_pruning=False, ordered_alpha_beta=False):
+    def __init__(self, heuristic_function, alpha_beta_pruning=False, ordered_alpha_beta=False,
+                 minimax_value_by_move=None):
         self.num_of_leaves_expanded = 0
         self.ordered_alpha_beta = ordered_alpha_beta
         self.alpha_beta_pruning = alpha_beta_pruning
         # self.heuristic_function_type = heuristic_function_type
         self.heuristic_function = heuristic_function
-        pass
+        self.last_iteration_minimax_val = minimax_value_by_move
+        self.is_root = True
 
     def solve_problem(self, problem, depth, playing_agent, alpha=float('-inf'), beta=float('inf')):
         """
 
+        :param alpha:
+        :param beta:
         :param problem:
         :param depth: if depth is a number then the function will act as depth restricted minmax otherwise if depth is
                         None then the function will act as a standard minmax
@@ -45,20 +49,28 @@ class Minimax:
         """
         if problem.is_goal(playing_agent):
             self.num_of_leaves_expanded += 1
-            return None, utility(problem), self.num_of_leaves_expanded
+            return None, utility(problem, playing_agent), self.num_of_leaves_expanded
         if depth == 0:
             self.num_of_leaves_expanded += 1
             return None, heuristic(problem), self.num_of_leaves_expanded
 
+        # generate legal moves ( order if needed )
         legal_moves = problem.legal_moves(playing_agent)
         best_move = legal_moves[0]
-        if self.ordered_alpha_beta:
-            legal_moves.sort()  # TODO sort the sons by heuristic func
+        tree_root_update_sons_minimax_value = False
+        if self.ordered_alpha_beta and self.is_root:
+            nr_of_legal_moves = len(legal_moves)
+            legal_moves = sorted(legal_moves,
+                                 key=lambda tup: self.last_iteration_minimax_val[tup],
+                                 reverse=True)
+            self.last_iteration_minimax_val.clear()
+            tree_root_update_sons_minimax_value = True
+            self.is_root = False
 
         # Maximizer
         if playing_agent == self.Maximizer:
             best_minmax_value = float("-inf")
-            for move in legal_moves:  # TODO add support for alpha beta pruning
+            for move in legal_moves:
                 problem.execute_move(playing_agent, move)
                 _, current_minmax_value, leaves = self.solve_problem(problem, depth - 1, self.Minimizer, alpha, beta)
                 if current_minmax_value > best_minmax_value:
@@ -70,6 +82,10 @@ class Minimax:
                         problem.undo_move(playing_agent, move)
                         return None, float('inf'), leaves
                 problem.undo_move(playing_agent, move)
+                # we only order the sons of the tree root so here we save the last moves to use for next iteration
+                if tree_root_update_sons_minimax_value:
+                    self.last_iteration_minimax_val[move] = current_minmax_value
+                    self.is_root = True if nr_of_legal_moves == len(self.last_iteration_minimax_val) else False
             return best_move, best_minmax_value, leaves
 
         # Minimizer

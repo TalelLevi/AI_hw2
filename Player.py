@@ -79,3 +79,5 @@ class Player:
                 0 <= location[0] + move[0] < len(self.board) and 0 <= location[1] + move[1] < len(self.board[0]) and
                 self.board[location[0] + move[0]][location[1] + move[1]] == 0]
 
+    def get_viable_moves(self):
+        return self.directions
