@@ -10,16 +10,18 @@ def utility(problem, playing_agent):
     return 0
 
 
-def estimate(problem):
-    player1 = 1
+def estimate(problem, playing_agent): # TODO fix heuristic func
+    if playing_agent:
+        possible_forks = problem.get_nr_of_neighbor_unvisited_cell(1)
+    else:
+        possible_forks = problem.get_nr_of_neighbor_unvisited_cell(2)
     route_length = problem.get_length_of_route()
-    possible_forks = problem.get_nr_of_neighbor_unvisited_cell(player1)
     dist_from_rival = problem.get_dist_from_rival()
     return 6 * route_length + 3 * possible_forks + dist_from_rival
 
 
-def heuristic(problem):
-    return estimate(problem)
+def heuristic(problem, playing_agent):
+    return estimate(problem, playing_agent)
 
 
 class Minimax:
@@ -47,12 +49,12 @@ class Minimax:
         :param playing_agent:
         :return:
         """
-        if problem.is_goal(playing_agent):
+        if problem.is_goal(playing_agent): # TODO track leaves better
             self.num_of_leaves_expanded += 1
             return None, utility(problem, playing_agent), self.num_of_leaves_expanded
         if depth == 0:
             self.num_of_leaves_expanded += 1
-            return None, heuristic(problem), self.num_of_leaves_expanded
+            return None, heuristic(problem, playing_agent), self.num_of_leaves_expanded
 
         # generate legal moves ( order if needed )
         legal_moves = problem.legal_moves(playing_agent)
