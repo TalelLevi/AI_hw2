@@ -60,7 +60,6 @@ class SimplePlayer:
                 self.board[new_loc] = 0
                 assert self.count_ones(self.board) == 0
 
-
         if best_move is None:
             # print(self.board)
             exit()

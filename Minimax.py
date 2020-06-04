@@ -10,7 +10,7 @@ def utility(problem, playing_agent):
     return 0
 
 
-def estimate(problem, playing_agent): # TODO fix heuristic func
+def estimate(problem, playing_agent):  # TODO fix heuristic func
     if playing_agent:
         possible_forks = problem.get_nr_of_neighbor_unvisited_cell(1)
     else:
@@ -28,12 +28,11 @@ class Minimax:
     Maximizer = True
     Minimizer = False
     single_leaf = 1
-    
+
     def __init__(self, heuristic_function, alpha_beta_pruning=False, ordered_alpha_beta=False,
                  minimax_value_by_move=None):
         self.ordered_alpha_beta = ordered_alpha_beta
         self.alpha_beta_pruning = alpha_beta_pruning
-        # self.heuristic_function_type = heuristic_function_type
         self.heuristic_function = heuristic_function
         self.last_iteration_minimax_val = minimax_value_by_move
         self.is_root = True
@@ -49,10 +48,10 @@ class Minimax:
         :param playing_agent:
         :return:
         """
-        if problem.is_goal(playing_agent): # TODO track leaves better
+        if problem.is_goal(playing_agent):
             return None, utility(problem, playing_agent), self.single_leaf
         if depth == 0:
-            return None, heuristic(problem, playing_agent), self.single_leaf
+            return None, self.heuristic_function(problem, playing_agent), self.single_leaf
         # generate legal moves ( order if needed )
         legal_moves = problem.legal_moves(playing_agent)
         best_move = legal_moves[0]

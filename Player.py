@@ -84,5 +84,5 @@ class Player:
     def get_length_of_route(self):
         return self.curr_path_len
 
-    def get_dist_from_rival(self):  # TODO remove this and replace with two functions get loc and rival loc.
+    def get_dist_from_rival(self):
         return abs(self.loc[0] - self.rival_loc[0]) + abs(self.loc[1] + self.rival_loc[1])
