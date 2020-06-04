@@ -1,10 +1,10 @@
 from Minimax import Minimax
 from time import time
 
-# import logging
-#
+import logging
+
 # lg = logging.getLogger("help me")
-#
+
 
 class RBMinmax:
 
@@ -12,8 +12,9 @@ class RBMinmax:
         self.ordered_alpha_beta = ordered_alpha_beta
         self.alpha_beta_pruning = alpha_beta_pruning
 
-    def estimate_next_iteration(self, number_of_leaves, last_iteration_time): # TODO improve the time bound
-        return last_iteration_time * 3 * number_of_leaves
+    def estimate_next_iteration(self, nr_of_leaves, last_iteration_time):
+        return last_iteration_time * (9 * nr_of_leaves - 2) / (3 * nr_of_leaves - 2)
+        # return last_iteration_time * 3 * nr_of_leaves #TODO remove
 
     def solve(self, time_limit, problem):
         start_time = time()
@@ -32,4 +33,5 @@ class RBMinmax:
             last_iteration_time = time() - iteration_start_time
             next_iteration_max_time = self.estimate_next_iteration(leaves, last_iteration_time)
             time_until_now = time() - start_time
+        # lg.error(f"max depth is {depth} ")
         return move

@@ -9,10 +9,9 @@ class Player:
         self.loc = None
         self.rival_loc = None
         self.board = None
-        self.curr_path_len = None # TODO this
+        self.curr_path_len = 0
 
     def set_game_params(self, board):
-        self.curr_path_len = 0
         self.board = board
         for i, row in enumerate(board):
             for j, val in enumerate(row):
@@ -81,3 +80,9 @@ class Player:
 
     def get_viable_moves(self):
         return self.directions
+
+    def get_length_of_route(self):
+        return self.curr_path_len
+
+    def get_dist_from_rival(self):  # TODO remove this and replace with two functions get loc and rival loc.
+        return abs(self.loc[0] - self.rival_loc[0]) + abs(self.loc[1] + self.rival_loc[1])
