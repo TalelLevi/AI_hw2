@@ -1,8 +1,5 @@
-from Minimax import Minimax
 from time import time
-
-import logging
-# lg = logging.getLogger("help me")
+from Minimax import Minimax
 
 
 class RBMinmax:
@@ -29,11 +26,9 @@ class RBMinmax:
         time_until_now = time() - start_time
         while time_until_now + next_iteration_max_time < time_limit:
             depth += 1
-            # lg.error(f"depth is {depth} current best move {move}")
             iteration_start_time = time()
             move, _, leaves = algo.solve_problem(problem=problem, depth=depth, playing_agent=1)
             last_iteration_time = time() - iteration_start_time
             next_iteration_max_time = self.estimate_next_iteration(leaves, last_iteration_time)
             time_until_now = time() - start_time
-        # lg.error(f"max depth is {depth} ")
-        return move
+        return move # TODO return to move

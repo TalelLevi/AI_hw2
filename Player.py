@@ -86,3 +86,9 @@ class Player:
 
     def get_dist_from_rival(self):
         return abs(self.loc[0] - self.rival_loc[0]) + abs(self.loc[1] + self.rival_loc[1])
+
+    def dist_from_edge(self, player):
+        if player == 1:
+            return abs(self.loc[0] - len(self.board)/2) + abs(self.loc[1] - len(self.board[0])/2)
+        else:
+            return abs(self.rival_loc[0] - len(self.board)/2) + abs(self.rival_loc[1] - len(self.board[0])/2)
