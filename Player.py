@@ -82,11 +82,11 @@ class Player:
     def get_dist_from_rival(self):
         return abs(self.loc[0] - self.rival_loc[0]) + abs(self.loc[1] + self.rival_loc[1])
 
-    def dist_from_edge(self, player):
+    def dist_from_mid(self, player):
         if player == 1:
-            return abs(self.loc[0] - len(self.board)/2) + abs(self.loc[1] - len(self.board[0])/2)
+            return abs(self.loc[0] - len(self.board) / 2) + abs(self.loc[1] - len(self.board[0]) / 2)
         else:
-            return abs(self.rival_loc[0] - len(self.board)/2) + abs(self.rival_loc[1] - len(self.board[0])/2)
+            return abs(self.rival_loc[0] - len(self.board) / 2) + abs(self.rival_loc[1] - len(self.board[0]) / 2)
 
     def in_board(self, cell):
         return 0 <= cell[0] < len(self.board) and 0 <= cell[1] < len(self.board[0])

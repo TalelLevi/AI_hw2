@@ -10,20 +10,6 @@ def utility(problem, playing_agent):
     return 0
 
 
-def estimate(problem, playing_agent):  # TODO fix heuristic func
-    if playing_agent:
-        possible_forks = problem.get_nr_of_neighbor_unvisited_cell(1)
-    else:
-        possible_forks = problem.get_nr_of_neighbor_unvisited_cell(2)
-    route_length = problem.get_length_of_route()
-    dist_from_rival = problem.get_dist_from_rival()
-    return 6 * route_length + 3 * possible_forks + dist_from_rival
-
-
-def heuristic(problem, playing_agent):
-    return estimate(problem, playing_agent)
-
-
 class Minimax:
     Maximizer = True
     Minimizer = False
@@ -52,6 +38,7 @@ class Minimax:
             return None, utility(problem, playing_agent), self.single_leaf
         if depth == 0:
             return None, self.heuristic_function(problem, playing_agent), self.single_leaf
+
         # generate legal moves ( order if needed )
         legal_moves = problem.legal_moves(playing_agent)
         best_move = legal_moves[0]
@@ -71,18 +58,27 @@ class Minimax:
         if playing_agent == self.Maximizer:
             best_minmax_value = float("-inf")
             for move in legal_moves:
+                # perform the move and check the minimax value for that move then revert
                 problem.execute_move(playing_agent, move)
                 _, current_minmax_value, leaves = self.solve_problem(problem, depth - 1, self.Minimizer, alpha, beta)
                 problem.undo_move(playing_agent, move)
 
+                # compare solutions by minimax value first,
+                # for equal values if win is possible pick fastest win
+                # if win is not reachable yet pick best value that has largest amount of leaves ( options )
                 curr_nr_of_leaves += leaves
                 if current_minmax_value > best_minmax_value:
                     best_minmax_value = current_minmax_value
                     best_move = move
                     possible_end_states = leaves
-                elif current_minmax_value == best_minmax_value and possible_end_states < leaves:
-                    best_move = move
-                    possible_end_states = leaves
+                elif current_minmax_value == best_minmax_value:
+                    if current_minmax_value == float('inf') and possible_end_states > leaves:
+                        best_move = move
+                        possible_end_states = leaves
+                    elif possible_end_states < leaves:
+                        best_move = move
+                        possible_end_states = leaves
+
                 if self.alpha_beta_pruning:
                     alpha = max(current_minmax_value, alpha)
                     if beta <= alpha != float('inf'):
@@ -97,18 +93,26 @@ class Minimax:
         else:  # playing_agent == self.Minimizer
             best_minmax_value = float("inf")
             for move in legal_moves:
+                # perform the move and check the minimax value for that move then revert
                 problem.execute_move(playing_agent, move)
                 _, current_minmax_value, leaves = self.solve_problem(problem, depth - 1, self.Maximizer, alpha, beta)
                 problem.undo_move(playing_agent, move)
 
+                # compare solutions by minimax value first,
+                # for equal values if win is possible pick fastest win
+                # if win is not reachable yet pick best value that has largest amount of leaves ( options )
                 curr_nr_of_leaves += leaves
                 if current_minmax_value < best_minmax_value:
                     best_minmax_value = current_minmax_value
                     best_move = move
                     possible_end_states = leaves
-                elif current_minmax_value == best_minmax_value and possible_end_states < leaves:
-                    best_move = move
-                    possible_end_states = leaves
+                elif current_minmax_value == best_minmax_value:
+                    if current_minmax_value == float('-inf') and possible_end_states > leaves:
+                        best_move = move
+                        possible_end_states = leaves
+                    elif possible_end_states < leaves:
+                        best_move = move
+                        possible_end_states = leaves
                 if self.alpha_beta_pruning:
                     beta = min(current_minmax_value, beta)
                     if alpha >= beta != float('-inf'):

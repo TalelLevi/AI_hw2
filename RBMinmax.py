@@ -31,5 +31,4 @@ class RBMinmax:
             last_iteration_time = time() - iteration_start_time
             next_iteration_max_time = self.estimate_next_iteration(leaves, last_iteration_time)
             time_until_now = time() - start_time
-        print(f'the depth is {depth}')
         return move # TODO return to move
