@@ -9,14 +9,14 @@ class Player:
         self.loc = None
         self.rival_loc = None
         self.board = None
-        self.curr_path_len = 0
+        self.start_loc = None
 
     def set_game_params(self, board):
         self.board = board
         for i, row in enumerate(board):
             for j, val in enumerate(row):
                 if val == self.player1:
-                    self.loc = (i, j)
+                    self.loc = self.start_loc = (i, j)
                 if val == self.player2:
                     self.rival_loc = (i, j)
 
@@ -26,7 +26,6 @@ class Player:
         self.rival_loc = loc
 
     def execute_move(self, player, move):
-        self.curr_path_len += 1
         if player == self.player1:
             new_player = self.player1
             old_location = self.loc
@@ -41,7 +40,6 @@ class Player:
         self.board[new_location] = new_player
 
     def undo_move(self, player, move):
-        self.curr_path_len -= 1
         if player == self.player1:
             new_player = self.player1
             old_location = self.loc
@@ -59,7 +57,7 @@ class Player:
         cells = 0
         for move in self.directions:
             cell = (i + move[0], j + move[1])
-            if 0 <= cell[0] < len(self.board) and 0 <= cell[1] < len(self.board[0]) and self.board[cell] == 0:
+            if self.in_board(cell) and self.board[cell] == 0:
                 cells += 1
         return cells
 
@@ -81,9 +79,6 @@ class Player:
     def get_viable_moves(self):
         return self.directions
 
-    def get_length_of_route(self):
-        return self.curr_path_len
-
     def get_dist_from_rival(self):
         return abs(self.loc[0] - self.rival_loc[0]) + abs(self.loc[1] + self.rival_loc[1])
 
@@ -92,3 +87,9 @@ class Player:
             return abs(self.loc[0] - len(self.board)/2) + abs(self.loc[1] - len(self.board[0])/2)
         else:
             return abs(self.rival_loc[0] - len(self.board)/2) + abs(self.rival_loc[1] - len(self.board[0])/2)
+
+    def in_board(self, cell):
+        return 0 <= cell[0] < len(self.board) and 0 <= cell[1] < len(self.board[0])
+
+    def manhattan_dist_from_start(self):
+        return abs(self.start_loc[0] - self.loc[0]) + abs(self.start_loc[1] - self.loc[1])
