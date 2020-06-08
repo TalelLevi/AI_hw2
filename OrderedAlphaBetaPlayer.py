@@ -1,6 +1,6 @@
 from Player import Player
 from RBMinmax import RBMinmax
-from Heuristics import Heuristic as Heuristic
+from Heuristics import Heuristic2 as Heuristic
 
 
 class OrderedAlphaBetaPlayer(Player):

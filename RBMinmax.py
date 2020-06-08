@@ -10,7 +10,7 @@ class RBMinmax:
         self.heuristic_function_type = heuristic_function_type
 
     def estimate_next_iteration(self, nr_of_leaves, last_iteration_time):
-        return last_iteration_time * (9 * nr_of_leaves - 2) / (3 * nr_of_leaves - 2)
+        return last_iteration_time * (9 * nr_of_leaves - 2) / (3 * nr_of_leaves - 2) + 0.0001*2*nr_of_leaves
 
     def solve(self, time_limit, problem):
         start_time = time()
@@ -31,5 +31,4 @@ class RBMinmax:
             last_iteration_time = time() - iteration_start_time
             next_iteration_max_time = self.estimate_next_iteration(leaves, last_iteration_time)
             time_until_now = time() - start_time
-        print(f'the move is {move},the value {c}, and the depth is {depth} at {problem.loc}\n')
         return move # TODO return to move
