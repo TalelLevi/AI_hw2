@@ -79,6 +79,9 @@ class Player:
     def get_viable_moves(self):
         return self.directions
 
+    def in_board(self, cell):
+        return 0 <= cell[0] < len(self.board) and 0 <= cell[1] < len(self.board[0])
+
     def get_dist_from_rival(self):
         return abs(self.loc[0] - self.rival_loc[0]) + abs(self.loc[1] + self.rival_loc[1])
 
@@ -88,8 +91,8 @@ class Player:
         else:
             return abs(self.rival_loc[0] - len(self.board) / 2) + abs(self.rival_loc[1] - len(self.board[0]) / 2)
 
-    def in_board(self, cell):
-        return 0 <= cell[0] < len(self.board) and 0 <= cell[1] < len(self.board[0])
-
     def manhattan_dist_from_start(self):
         return abs(self.start_loc[0] - self.loc[0]) + abs(self.start_loc[1] - self.loc[1])
+
+    def manhattan_dist_from_player(self, cell):
+        return abs(self.loc[0] - cell[0]) + abs(self.loc[1] - cell[1])
