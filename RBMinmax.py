@@ -10,7 +10,7 @@ class RBMinmax:
         self.heuristic_function_type = heuristic_function_type
 
     def estimate_next_iteration(self, nr_of_leaves, last_iteration_time):
-        return last_iteration_time * (9 * nr_of_leaves - 2) / (3 * nr_of_leaves - 2) + 0.0001*2*nr_of_leaves
+        return last_iteration_time * (9 * nr_of_leaves - 2) / (3 * nr_of_leaves - 2) #+ 0.0001*2*nr_of_leaves
 
     def solve(self, time_limit, problem):
         start_time = time()

@@ -1,8 +1,5 @@
 class Heuristic:
     def estimate(self, problem, playing_agent):
-        # if problem.get_dist_from_rival() <= 15:
-        #     # check if path exists if yes do something.
-        #     return 18 + problem.get_nr_of_neighbor_unvisited_cell(1)
         up_left = 0
         up_right = 0
         down_left = 0
@@ -102,7 +99,7 @@ def dfsl(problem, cell, visited=None):
 
     for curr_cell in legal_cells:
         # check if we escaped the "box"
-        if abs(problem.loc[0] - curr_cell[0]) > 3 or abs(problem.loc[1] - curr_cell[1]) > 3:
+        if abs(problem.loc[0] - curr_cell[0]) > 4 or abs(problem.loc[1] - curr_cell[1]) > 4:
             return True
         elif dfsl(problem, curr_cell, visited):
             return True
@@ -111,20 +108,19 @@ def dfsl(problem, cell, visited=None):
 
 class Heuristic2:
     war_radius = 7
+    min_value_offset = 35
     def estimate(self, problem, playing_agent):
         dist_from_rival = problem.get_dist_from_rival()
         if dist_from_rival <= self.war_radius:
             return 100 - round((dist_from_rival/self.war_radius)*3) + problem.get_nr_of_neighbor_unvisited_cell(1)
 
-        # escape_route = backtrack_out(problem, problem.loc)
-        escape_route2 = dfsl(problem, problem.loc)
-        if not escape_route2:
-            return -100
+        escape_route = dfsl(problem, problem.loc)
+        if not escape_route:
+            return -self.min_value_offset
         count = 0
-        for i in range(-3, 4):
-            for j in range(-3, 4):
-                if (i == 0 and j == -1 or j == 1) or (j == 0 and i == 1 or i == -1):
-                    continue
+        count2 = 0
+        for i in range(-4, 5):
+            for j in range(-4, 5):
                 cell = (problem.loc[0] + i, problem.loc[1] + j)
                 if problem.in_board(cell):
                     if problem.board[cell] == -1:
@@ -133,7 +129,7 @@ class Heuristic2:
                         count -= 1
                 else:
                     count += 1
-        max_dist = len(problem.board) + len(problem.board[0])
-        curr_dist_from_start = problem.manhattan_dist_from_start()
-        value = count - round((curr_dist_from_start / max_dist)) * 30
-        return value
+        # max_dist = len(problem.board) + len(problem.board[0])
+        # curr_dist_from_start = problem.manhattan_dist_from_start()
+        # value = count - round((curr_dist_from_start / max_dist)) * 35
+        return count + self.min_value_offset
