@@ -65,20 +65,20 @@ class Minimax:
 
                 # compare solutions by minimax value first,
                 # for equal values if win is possible pick fastest win
-                # if win is not reachable yet pick best value that has largest amount of leaves ( options )
+                # if win is not reachable yet pick best value that has largest amount of leaves ( "options" )
                 curr_nr_of_leaves += leaves
                 if current_minmax_value > best_minmax_value:
                     best_minmax_value = current_minmax_value
                     best_move = move
                     possible_end_states = leaves
                 elif current_minmax_value == best_minmax_value:
-                    if current_minmax_value == float('inf') and possible_end_states > leaves:
-                        best_move = move
-                        possible_end_states = leaves
+                    if current_minmax_value == float('inf'):
+                        if possible_end_states > leaves:
+                            best_move = move
+                            possible_end_states = leaves
                     elif possible_end_states < leaves:
                         best_move = move
                         possible_end_states = leaves
-
                 if self.alpha_beta_pruning:
                     alpha = max(current_minmax_value, alpha)
                     if beta <= alpha != float('inf'):
@@ -107,9 +107,10 @@ class Minimax:
                     best_move = move
                     possible_end_states = leaves
                 elif current_minmax_value == best_minmax_value:
-                    if current_minmax_value == float('-inf') and possible_end_states > leaves:
-                        best_move = move
-                        possible_end_states = leaves
+                    if current_minmax_value == float('-inf'):
+                        if possible_end_states > leaves:
+                            best_move = move
+                            possible_end_states = leaves
                     elif possible_end_states < leaves:
                         best_move = move
                         possible_end_states = leaves
