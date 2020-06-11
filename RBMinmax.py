@@ -27,6 +27,7 @@ class RBMinmax:
         while time_until_now + next_iteration_max_time < time_limit:
             depth += 1
             iteration_start_time = time()
+            algo.set_root_call()
             move, c, leaves = algo.solve_problem(problem=problem, depth=depth, playing_agent=1)
             last_iteration_time = time() - iteration_start_time
             next_iteration_max_time = self.estimate_next_iteration(leaves, last_iteration_time)

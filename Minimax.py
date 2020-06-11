@@ -23,6 +23,9 @@ class Minimax:
         self.last_iteration_minimax_val = minimax_value_by_move
         self.is_root = True
 
+    def set_root_call(self):
+        self.is_root = True
+
     def solve_problem(self, problem, depth, playing_agent, alpha=float('-inf'), beta=float('inf')):
         """
 
@@ -46,10 +49,7 @@ class Minimax:
         possible_end_states = 0
         tree_root_update_sons_minimax_value = False
         if self.ordered_alpha_beta and self.is_root:
-            nr_of_legal_moves = len(legal_moves)
-            legal_moves = sorted(legal_moves,
-                                 key=lambda tup: self.last_iteration_minimax_val[tup],
-                                 reverse=True)
+            legal_moves.sort(key=lambda tup: self.last_iteration_minimax_val[tup], reverse=playing_agent)
             self.last_iteration_minimax_val.clear()
             tree_root_update_sons_minimax_value = True
             self.is_root = False
@@ -61,16 +61,17 @@ class Minimax:
                 # perform the move and check the minimax value for that move then revert
                 problem.execute_move(playing_agent, move)
                 _, current_minmax_value, leaves = self.solve_problem(problem, depth - 1, self.Minimizer, alpha, beta)
+                curr_nr_of_leaves += leaves
                 problem.undo_move(playing_agent, move)
 
                 # compare solutions by minimax value first,
-                # for equal values if win is possible pick fastest win
-                # if win is not reachable yet pick best value that has largest amount of leaves ( "options" )
-                curr_nr_of_leaves += leaves
                 if current_minmax_value > best_minmax_value:
                     best_minmax_value = current_minmax_value
                     best_move = move
                     possible_end_states = leaves
+
+                # for equal values if win is possible pick fastest win
+                # if win is not reachable yet pick best value that has largest amount of leaves ( "options" )
                 elif current_minmax_value == best_minmax_value:
                     if current_minmax_value == float('inf'):
                         if possible_end_states > leaves:
@@ -86,7 +87,6 @@ class Minimax:
                 # we only order the sons of the tree root so here we save the last moves to use for next iteration
                 if tree_root_update_sons_minimax_value:
                     self.last_iteration_minimax_val[move] = current_minmax_value
-                    self.is_root = True if nr_of_legal_moves == len(self.last_iteration_minimax_val) else False
             return best_move, best_minmax_value, curr_nr_of_leaves
 
         # Minimizer
@@ -96,16 +96,17 @@ class Minimax:
                 # perform the move and check the minimax value for that move then revert
                 problem.execute_move(playing_agent, move)
                 _, current_minmax_value, leaves = self.solve_problem(problem, depth - 1, self.Maximizer, alpha, beta)
+                curr_nr_of_leaves += leaves
                 problem.undo_move(playing_agent, move)
 
                 # compare solutions by minimax value first,
-                # for equal values if win is possible pick fastest win
-                # if win is not reachable yet pick best value that has largest amount of leaves ( options )
-                curr_nr_of_leaves += leaves
                 if current_minmax_value < best_minmax_value:
                     best_minmax_value = current_minmax_value
                     best_move = move
                     possible_end_states = leaves
+
+                # for equal values if win is possible pick fastest win
+                # if win is not reachable yet pick best value that has largest amount of leaves ( options )
                 elif current_minmax_value == best_minmax_value:
                     if current_minmax_value == float('-inf'):
                         if possible_end_states > leaves:
