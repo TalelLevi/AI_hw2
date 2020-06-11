@@ -44,8 +44,6 @@ class Heuristic:
                    abs(up_left + up_right + down_right + up + right - down - left - down_left))
 
 
-
-
 # def timing(func):
 #     import time
 #     def wrapper(*args, **kwargs):
@@ -106,19 +104,43 @@ def dfsl(problem, cell, visited=None):
     return False
 
 
-class Heuristic2:
+def dfsl_aux(problem):
+    visited = set()
+    escaped = set()
+    dfsl2(problem, problem.loc, visited, escaped)
+    return visited, escaped
+
+
+def dfsl2(problem, cell, visited=None, escaped=None):
+    if visited is None:
+        visited = set()
+    visited.add(cell)
+    if abs(problem.loc[0] - cell[0]) > 4 or abs(problem.loc[1] - cell[1]) > 4:
+        escaped.add(cell)
+
+    considered_cells = [(move[0] + cell[0], move[1] + cell[1]) for move in problem.get_viable_moves()]
+    legal_cells = [cell for cell in considered_cells if problem.in_board(cell)
+                   and cell not in visited
+                   and problem.board[cell] == 0]
+
+    for curr_cell in legal_cells:
+        dfsl2(problem, curr_cell, visited, escaped)
+
+
+
+class Heuristic3:
     war_radius = 7
     min_value_offset = 35
+
     def estimate(self, problem, playing_agent):
         dist_from_rival = problem.get_dist_from_rival()
         if dist_from_rival <= self.war_radius:
-            return 100 - round((dist_from_rival/self.war_radius)*3) + problem.get_nr_of_neighbor_unvisited_cell(1)
+            return 100 - round((dist_from_rival / self.war_radius) * 3) + problem.get_nr_of_neighbor_unvisited_cell(1)
 
         escape_route = dfsl(problem, problem.loc)
         if not escape_route:
             return -self.min_value_offset
         count = 0
-        count2 = 0
         for i in range(-4, 5):
             for j in range(-4, 5):
                 cell = (problem.loc[0] + i, problem.loc[1] + j)
@@ -133,3 +155,34 @@ class Heuristic2:
         # curr_dist_from_start = problem.manhattan_dist_from_start()
         # value = count - round((curr_dist_from_start / max_dist)) * 35
         return count + self.min_value_offset
+
+class Heuristic2:
+    war_radius = 7
+    min_value_offset = 35
+
+    def estimate(self, problem, playing_agent):
+        dist_from_rival = problem.get_dist_from_rival()
+        if dist_from_rival <= self.war_radius:
+            return 100 - round((dist_from_rival / self.war_radius) * 3) + problem.get_nr_of_neighbor_unvisited_cell(1)
+
+        visited, escaped = dfsl_aux(problem)
+        escape_route = dfsl(problem,problem.loc)
+        if len(escaped) > 0 and not escape_route:
+            print('ERRORRRRRR ERRRORRRRRR')
+        if len(escaped) == 0:
+            return -self.min_value_offset
+        count = 0
+        for i in range(-4, 5):
+            for j in range(-4, 5):
+                cell = (problem.loc[0] + i, problem.loc[1] + j)
+                if problem.in_board(cell):
+                    if problem.board[cell] == -1:
+                        count += 2
+                    elif problem.board[cell] == 0:
+                        count -= 1
+                else:
+                    count += 1
+        # max_dist = len(problem.board) + len(problem.board[0])
+        # curr_dist_from_start = problem.manhattan_dist_from_start()
+        # value = count - round((curr_dist_from_start / max_dist)) * 35
+        return count + self.min_value_offset + len(visited)
